@@ -1,0 +1,10 @@
+{
+  "name": "slgw-supervisor",
+  "version": "1.0.0",
+  "description": "A SLGatewayV2 fleet monitoring server",
+  "main": "server",
+  "repository": "git@github.com:SensingLabs/slgw-supervisor.git",
+  "author": "David Olivari <david.olivari@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
