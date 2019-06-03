@@ -25,6 +25,8 @@ module.exports = {
     'space-before-function-paren': 'off',
     'func-call-spacing': 'off',
     'template-tag-spacing': 'off'
-  },
-  extends: 'standard'
+  },  plugins: [
+      'vue'
+    ],
+  extends: ['standard','plugin:vue/recommended']
 }

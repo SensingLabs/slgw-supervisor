@@ -10,7 +10,9 @@
   "dependencies": {
     "bootstrap-vue": "^2.0.0-rc.21",
     "core-js": "^2.6.5",
+    "cors": "^2.8.5",
     "mongodb": "^3.2.6",
+    "qs-middleware": "^1.0.3",
     "restana": "^3.0.2",
     "vue": "^2.6.10"
   },
