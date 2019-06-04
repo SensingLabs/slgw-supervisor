@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <FirstRun />
+    <FirstRun v-if="!mqttcheck" />
   </div>
 </template>
 
@@ -8,9 +8,20 @@
 import FirstRun from './components/FirstRun.vue'
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
     FirstRun
+  },
+  data: () => ({
+    mqttcheck: false
+  }),
+  async mounted() {
+    let _response = await fetch('http://localhost:9999/settings/mqtt', {
+      method: 'GET',
+      mode: 'cors'
+    })
+    let data = await _response.json()
+    this.mqttcheck = data.check
   }
 }
 </script>

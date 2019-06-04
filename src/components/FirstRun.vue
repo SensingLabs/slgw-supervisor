@@ -1,9 +1,13 @@
 <template>
   <b-container id="first-run">
-    <b-card header="First Run">
+    <b-card
+      header="First Run"
+      bg-variant="dark"
+      text-variant="white"
+    >
       <mqtt-config />
-      <hr>
     </b-card>
+    <br>
   </b-container>
 </template>
 <script>
@@ -15,8 +19,3 @@ export default {
   }
 }
 </script>
-<style>
-hr {
-  border-color: #444;
-}
-</style>

@@ -1,33 +1,88 @@
 <template>
   <div id="mqtt-config">
-    <h3 class="text-muted">
+    <h4 class="card-title">
       MQTT
-    </h3>
+    </h4>
     <b-row class="justify-content-center">
       <b-col lg="8">
         <b-form-group label="Connection URL">
-          <b-form-input v-model="url" />
+          <b-form-input
+            v-model="mqtturl"
+            size="sm"
+          />
+        </b-form-group>
+      </b-col>
+      <b-col lg="4">
+        <b-form-group label="ClientID">
+          <b-form-input
+            v-model="clientid"
+            size="sm"
+          />
         </b-form-group>
       </b-col>
     </b-row>
     <b-row class="justify-content-center">
       <b-col lg="5">
         <b-form-group label="Status topic (sub)">
-          <b-form-input v-model="stopic" />
+          <b-form-input
+            v-model="stopic"
+            size="sm"
+          />
         </b-form-group>
       </b-col>
       <b-col lg="5">
         <b-form-group label="Command topic (pub)">
-          <b-form-input v-model="ctopic" />
+          <b-form-input
+            v-model="ctopic"
+            size="sm"
+          />
         </b-form-group>
       </b-col>
     </b-row>
+    <b-row class="justify-content-center">
+      <b-col lg="4">
+        <b-form-group label="Certificats">
+          <b-form-textarea
+            v-model="cert"
+            rows="21"
+            class="smalltext"
+            size="sm"
+          />
+        </b-form-group>
+      </b-col>
+      <b-col lg="4">
+        <b-form-group label="Private Key">
+          <b-form-textarea
+            v-model="key"
+            rows="21"
+            class="smalltext"
+            size="sm"
+          />
+        </b-form-group>
+      </b-col>
+      <b-col lg="4">
+        <b-form-group label="CA Root">
+          <b-form-textarea
+            v-model="ca"
+            rows="21"
+            class="smalltext"
+            size="sm"
+          />
+        </b-form-group>
+      </b-col>
+    </b-row>
+
     <b-row class="justify-content-center">
       <b-col lg="10">
         &nbsp;
       </b-col>
       <b-col>
-        <b-button @click="save">
+        <b-button
+          variant="info"
+          class="float-right"
+          size="sm"
+          @click="save"
+        >
           Save
         </b-button>
       </b-col>
@@ -38,32 +93,53 @@
 export default {
   name: 'MqttConfig',
   data: () => ({
-    url: '',
+    mqtturl: '',
+    clientid: '',
     stopic: '',
-    ctopic: ''
+    ctopic: '',
+    cert: '',
+    key: '',
+    ca: ''
   }),
-  method: {
-    async save() {
-      await fetch('http://localhost:8888/settings/mqtt', {
-        method: 'PUT',
-        mode: 'cors',
-        body: this.data
-      })
-    }
-  },
   async mounted() {
-    let _data = await fetch('http://localhost:8888/settings/mqtt', {
+    let _response = await fetch('http://localhost:9999/settings/mqtt', {
       method: 'GET',
       mode: 'cors'
     })
-    this.url = _data.url
-    this.stopic = _data.stopic
-    this.ctopic = _data.ctopic
+    let data = await _response.json()
+    if (null != data) {
+      for (let key in data) {
+        if (key !== '_id') this[key] = data[key]
+      }
+    }
+  },
+  methods: {
+    async save() {
+      await fetch('http://localhost:9999/settings/mqtt', {
+        method: 'PUT',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this._data)
+      })
+      let _response = await fetch('http://localhost:9999/settings/mqtt', {
+        method: 'GET',
+        mode: 'cors'
+      })
+      let data = await _response.json()
+      console.log(data)
+      this.$parent.$parent.mqttcheck = data.check
+    }
   }
 }
 </script>
 <style>
+.smalltext {
+  font-size: 7px !important;
+  font-family: monospace;
+}
 legend {
-  color: #f39c12;
+  color: #f0ad4e !important;
 }
 </style>
