@@ -6,7 +6,9 @@ module.exports = async function(message, db) {
     let newDevRec = {
       gatewayId: message.gatewayId,
       devEUI: device.devEUI,
-      firmwareType: device.firmwareType
+      firmwareType: device.firmwareType,
+      firmwareVersion: device.firmwareVersion,
+      name: device.deviceName
     }
     for (let status of device.status) {
       newDevRec[status.id] = status.value

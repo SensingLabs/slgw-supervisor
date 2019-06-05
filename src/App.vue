@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <FirstRun v-if="!mqttcheck" />
+    <Gateways v-if="mqttcheck" />
   </div>
 </template>
 
 <script>
 import FirstRun from './components/FirstRun.vue'
+import Gateways from './components/Gateways.vue'
 
 export default {
   name: 'App',
   components: {
-    FirstRun
+    FirstRun,
+    Gateways
   },
   data: () => ({
     mqttcheck: false
@@ -25,9 +28,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#app {
-  margin-top: 60px;
-}
-</style>
