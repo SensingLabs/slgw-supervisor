@@ -8,6 +8,15 @@
       :fields="devfields"
     >
       <template
+        slot="firmwareType"
+        slot-scope="item"
+      >
+        <b-badge class="badge-pill badge-dark">
+          {{ item.item.firmwareType }}
+        </b-badge>
+        <sub> {{ item.item.firmwareVersion }}</sub>
+      </template>
+      <template
         slot="lastFrameDate"
         slot-scope="item"
       >
@@ -17,7 +26,12 @@
         slot="frameCountUp"
         slot-scope="item"
       >
-        {{ item.item.frameCountUp }} / {{ item.item.frameCountDown }}
+        ↓ {{ item.item.frameCountDown }} ↑
+        {{ item.item.frameCountUp }}
+        /
+        <span class="text-warning">
+          {{ item.item.missedFrames }}
+        </span>
       </template>
       <template
         slot="lastFrameRSSI"
@@ -65,6 +79,105 @@
         <p>Free {{ Math.floor(item.freemem / 1048576) }} / Total {{ Math.floor(item.totalmem / 1048576) }} MB</p>
       </b-col>
     </b-row>
+    <h4>
+      Actions
+    </h4>
+    <b-row>
+      <b-col lg="2">
+        <h5>admin</h5>
+        <b-button
+          variant="info"
+          size="sm"
+        >
+          Sync Date
+        </b-button>
+        &nbsp;
+        <b-button
+          variant="warning"
+          size="sm"
+        >
+          Reboot
+        </b-button>
+      </b-col>
+      <b-col lg="2">
+        <h5>Custom VPN</h5>
+        <p>
+          <b-button
+            variant="success"
+            size="sm"
+            @click="remoteService('start/custom')"
+          >
+            Start
+          </b-button>
+          &nbsp;
+          <b-button
+            variant="danger"
+            size="sm"
+            @click="remoteService('stop/custom')"
+          >
+            Stop
+          </b-button>
+        </p>
+        <h5>SL Remote</h5>
+        <p>
+          <b-button
+            variant="success"
+            size="sm"
+            @click="remoteService('start/vpn')"
+          >
+            Start
+          </b-button>
+          &nbsp;
+          <b-button
+            variant="danger"
+            size="sm"
+            @click="remoteService('stop/vpn')"
+          >
+            Stop
+          </b-button>
+        </p>
+      </b-col>
+      <b-col lg="4">
+        <h5>ngrok</h5>
+        <p>
+          <b-button
+            variant="success"
+            size="sm"
+            @click="remoteService('start/ngrok')"
+          >
+            Start
+          </b-button>
+          &nbsp;
+          <b-button
+            variant="danger"
+            size="sm"
+            @click="remoteService('stop/ngrok')"
+          >
+            Stop
+          </b-button>
+        </p>
+        <p><b-form-input size="sm" /></p>
+
+        <p>
+          <b-button
+            variant="info"
+            size="sm"
+          >
+            Send NGROK token
+          </b-button>
+          &nbsp;
+        </p>
+        <p>
+          <b-link
+            v-if="item.ngrok !== ''"
+            :href="item.ngrok"
+            target="_blank"
+          >
+            <u> {{ item.ngrok }}</u>
+          </b-link>
+        </p>
+      </b-col>
+    </b-row>
   </b-card>
 </template>
 <script>
@@ -87,13 +200,11 @@ export default {
     devfields: {
       name: { label: 'Name' },
       firmwareType: { label: 'Model' },
-      firmwareVersion: { label: 'Version' },
       lastFrameDate: { label: 'Last' },
       lastDown: { label: 'Down' },
-      missedFrames: { label: 'Missed' },
       lastFrameRSSI: { label: 'RF Level' },
-      frameCountUp: { label: 'FCnt Up / Down' },
-      devEUI: { label: 'ID' }
+      frameCountUp: { label: 'FCnt / Missed' },
+      devEUI: { label: 'Device ID' }
     },
     interfaces: []
   }),
@@ -101,6 +212,13 @@ export default {
     this.update()
   },
   methods: {
+    async remoteService(action) {
+      await fetch('http://localhost:9999/' + action + '/' + this.item.gatewayId, {
+        method: 'PUT',
+        mode: 'cors'
+      })
+      setTimeout(this.$parent.$parent.update, 2000)
+    },
     signalLevel(item) {
       if (!item.lastFrameRSSI) return 0
       let composite = 1 * item.lastFrameRSSI
@@ -118,6 +236,7 @@ export default {
       return 'text-success'
     },
     update() {
+      this.interfaces = []
       for (let _i in this.item.interfaces) {
         for (let _a in this.item.interfaces[_i]) {
           if ('lo' !== _i && this.item.interfaces[_i][_a].family !== 'IPv6') {
@@ -136,3 +255,8 @@ export default {
   }
 }
 </script>
+<style>
+.badge-dark {
+  background-color: #919aa1;
+}
+</style>

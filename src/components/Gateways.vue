@@ -77,13 +77,27 @@
         </b-badge>
       </template>
       <template
-        v-if="item.item.ngrok !== ''"
         slot="ngrok"
         slot-scope="item"
       >
-        <b-link :href="item.item.ngrok">
-          ngrok
-        </b-link>
+        <div class="text-center">
+          <b-link
+            v-if="item.item.ngrok !== ''"
+            :href="item.item.ngrok"
+            target="_blank"
+          >
+            <u>open</u>
+          </b-link>
+          <b-button
+            v-else
+            variant="light"
+            class="badge-pill"
+            size="sm"
+            @click="ngrok(item.item.gatewayId)"
+          >
+            start
+          </b-button>
+        </div>
       </template>
       <template
         slot="row-details"
@@ -121,7 +135,6 @@ export default {
       devices: { label: 'Devices' },
       uptime: { label: 'Started' },
       rootfs: { label: 'Free storage' },
-      freemem: { label: 'Free memory' },
       ngrok: { label: 'Remote Link' },
       loadavg: { label: 'CPU Loads' }
     }
@@ -130,6 +143,13 @@ export default {
     this.update()
   },
   methods: {
+    async ngrok(gwid) {
+      await fetch('http://localhost:9999/start/ngrok/' + gwid, {
+        method: 'PUT',
+        mode: 'cors'
+      })
+      setTimeout(this.update, 2000)
+    },
     getWarnDev(devs) {
       let c = 0
       for (let dev of devs) {
@@ -161,13 +181,12 @@ export default {
       else if (free < 25) return 'progress-bar bg-warning'
       else return 'progress-bar bg-success'
     },
-    update() {
-      fetch('http://localhost:9999/data/gateways', {
+    async update() {
+      let _response = await fetch('http://localhost:9999/data/gateways', {
         method: 'GET',
         mode: 'cors'
-      }).then(async _response => {
-        this.gateways = await _response.json()
       })
+      this.gateways = await _response.json()
     }
   }
 }
