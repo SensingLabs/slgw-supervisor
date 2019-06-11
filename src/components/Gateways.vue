@@ -144,7 +144,7 @@ export default {
   },
   methods: {
     async ngrok(gwid) {
-      await fetch('http://localhost:9999/start/ngrok/' + gwid, {
+      await fetch('/start/ngrok/' + gwid, {
         method: 'PUT',
         mode: 'cors'
       })
@@ -182,7 +182,7 @@ export default {
       else return 'progress-bar bg-success'
     },
     async update() {
-      let _response = await fetch('http://localhost:9999/data/gateways', {
+      let _response = await fetch('/data/gateways', {
         method: 'GET',
         mode: 'cors'
       })

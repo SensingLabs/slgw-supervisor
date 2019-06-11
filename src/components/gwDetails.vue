@@ -84,22 +84,6 @@
     </h4>
     <b-row>
       <b-col lg="2">
-        <h5>admin</h5>
-        <b-button
-          variant="info"
-          size="sm"
-        >
-          Sync Date
-        </b-button>
-        &nbsp;
-        <b-button
-          variant="warning"
-          size="sm"
-        >
-          Reboot
-        </b-button>
-      </b-col>
-      <b-col lg="2">
         <h5>Custom VPN</h5>
         <p>
           <b-button
@@ -213,7 +197,7 @@ export default {
   },
   methods: {
     async remoteService(action) {
-      await fetch('http://localhost:9999/' + action + '/' + this.item.gatewayId, {
+      await fetch('/' + action + '/' + this.item.gatewayId, {
         method: 'PUT',
         mode: 'cors'
       })

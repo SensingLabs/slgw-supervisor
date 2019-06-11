@@ -102,7 +102,7 @@ export default {
     ca: ''
   }),
   async mounted() {
-    let _response = await fetch('http://localhost:9999/settings/mqtt', {
+    let _response = await fetch('/settings/mqtt', {
       method: 'GET',
       mode: 'cors'
     })
@@ -115,7 +115,7 @@ export default {
   },
   methods: {
     async save() {
-      await fetch('http://localhost:9999/settings/mqtt', {
+      await fetch('/settings/mqtt', {
         method: 'PUT',
         mode: 'cors',
         headers: {
@@ -123,7 +123,7 @@ export default {
         },
         body: JSON.stringify(this._data)
       })
-      let _response = await fetch('http://localhost:9999/settings/mqtt', {
+      let _response = await fetch('/settings/mqtt', {
         method: 'GET',
         mode: 'cors'
       })

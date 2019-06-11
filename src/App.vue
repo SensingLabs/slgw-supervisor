@@ -19,7 +19,7 @@ export default {
     mqttcheck: false
   }),
   async mounted() {
-    let _response = await fetch('http://localhost:9999/settings/mqtt', {
+    let _response = await fetch('/settings/mqtt', {
       method: 'GET',
       mode: 'cors'
     })
