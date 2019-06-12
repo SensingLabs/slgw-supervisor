@@ -29,6 +29,24 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+  service.put('/save/ngrok/:gwid', (req, res) => {
+    global.mqttClient.publish(
+      mqttSettings.ctopic,
+      JSON.stringify({
+        gwid: req.params.gwid,
+        commands: [
+          {
+            method: 'POST',
+            path: '/API/ngrok/save',
+            body: {
+              ngroktoken: req.query.ngroktoken
+            }
+          }
+        ]
+      })
+    )
+    res.end()
+  })
   service.put('/start/vpn/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,

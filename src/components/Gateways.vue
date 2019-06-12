@@ -1,7 +1,7 @@
 <template>
   <div id="gateways">
     <b-table
-      :items="this.gateways"
+      :items="gateways"
       :fields="gwfields"
       small
     >
@@ -37,6 +37,12 @@
         </b-badge>
       </template>
       <template
+        slot="version"
+        slot-scope="item"
+      >
+        <small>{{ item.item.version }} / {{ item.item.rfversion }}</small>
+      </template>
+      <template
         slot="uptime"
         slot-scope="item"
       >
@@ -67,16 +73,6 @@
         </div>
       </template>
       <template
-        slot="loadavg"
-        slot-scope="item"
-      >
-        <b-badge class="badge badge-light">
-          {{ Math.floor(item.item.loadavg[0] * 100) / 100 }}<sub> 1 min</sub>
-          {{ Math.floor(item.item.loadavg[1] * 100) / 100 }}<sub> 5 min</sub>
-          {{ Math.floor(item.item.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
-        </b-badge>
-      </template>
-      <template
         slot="ngrok"
         slot-scope="item"
       >
@@ -98,6 +94,17 @@
             start
           </b-button>
         </div>
+      </template>
+      <template
+        slot="timestamp"
+        slot-scope="item"
+      >
+        <vue-moments-ago
+          prefix=""
+          suffix="ago"
+          lang="en"
+          :date="item.item.timestamp"
+        />
       </template>
       <template
         slot="row-details"
@@ -123,32 +130,36 @@
 <script>
 import moment from 'moment'
 import gwDetails from './gwDetails'
+import { mapState } from 'vuex'
+import VueMomentsAgo from 'vue-moments-ago'
+
 export default {
   name: 'Gateways',
-  components: { gwDetails },
+  components: { gwDetails, VueMomentsAgo },
   data: () => ({
-    gateways: null,
+    polling: null,
     gwfields: {
       show_details: { label: '' },
       gatewayId: { label: 'HWID' },
       name: { label: 'Name' },
+      version: { label: 'Version' },
       devices: { label: 'Devices' },
       uptime: { label: 'Started' },
       rootfs: { label: 'Free storage' },
       ngrok: { label: 'Remote Link' },
-      loadavg: { label: 'CPU Loads' }
+      timestamp: { label: 'Status' }
     }
   }),
   async mounted() {
-    this.update()
+    this.$store.dispatch('gatewaysFetch')
+  },
+  computed: mapState(['gateways']),
+  beforeDestroy() {
+    clearInterval(this.polling)
   },
   methods: {
-    async ngrok(gwid) {
-      await fetch('/start/ngrok/' + gwid, {
-        method: 'PUT',
-        mode: 'cors'
-      })
-      setTimeout(this.update, 2000)
+    ngrok(gwid) {
+      this.$store.dispatch('startNgrok', { gwid })
     },
     getWarnDev(devs) {
       let c = 0
@@ -180,13 +191,6 @@ export default {
       if (free < 10) return 'progress-bar bg-danger'
       else if (free < 25) return 'progress-bar bg-warning'
       else return 'progress-bar bg-success'
-    },
-    async update() {
-      let _response = await fetch('/data/gateways', {
-        method: 'GET',
-        mode: 'cors'
-      })
-      this.gateways = await _response.json()
     }
   }
 }

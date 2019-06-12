@@ -2,6 +2,7 @@ module.exports = async function(message, db) {
   let gateways = db.collection('gateways')
   let devices = db.collection('devices')
   message.timestamp = new Date()
+  let _devices = []
   if (message.devices) {
     for (let device of message.devices) {
       let newDevRec = {
@@ -15,11 +16,14 @@ module.exports = async function(message, db) {
         newDevRec[status.id] = status.value
       }
       await devices.updateOne({ devEUI: device.devEUI }, { $set: newDevRec }, { upsert: true })
+      _devices.push(newDevRec)
     }
     message.deviceCount = message.devices.length
     delete message.devices
     await gateways.updateOne({ gatewayId: message.gatewayId }, { $set: message }, { upsert: true })
+    message.devices = _devices
   }
+  global.ws.send(JSON.stringify(message))
   if (message.command) {
     if (message.command.path === '/API/ngrok/start') {
       await gateways.updateOne({ gatewayId: message.gwid }, { $set: { ngrok: message.response.url } })
