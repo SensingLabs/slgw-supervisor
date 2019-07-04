@@ -234,7 +234,7 @@ export default {
       return 'text-success'
     },
     agoLF(val) {
-      let lf = moment.duration(moment().diff(moment(val)))
+      let lf = moment.duration(moment(this.item.timestamp).diff(moment(val)))
       return lf.humanize()
     },
     update() {

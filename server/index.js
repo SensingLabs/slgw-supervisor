@@ -20,11 +20,11 @@ MongoClient.MongoClient.connect('mongodb://localhost/supervisor', {
   require('./settings')(service, db)
   require('./mqtt')(service, db)
   require('./basics')(service, db)
-
+  global.ws = { readyState: 0 }
   service.ws('/', function(ws, req) {
     global.ws = ws
   })
 
   await service.listen(port)
-  console.log(`Restana server started on port ${port}`)
+  console.log(`Restana server started on port http://localhost:${port}`)
 }, console.error)

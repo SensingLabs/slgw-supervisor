@@ -23,7 +23,9 @@ module.exports = async function(message, db) {
     await gateways.updateOne({ gatewayId: message.gatewayId }, { $set: message }, { upsert: true })
     message.devices = _devices
   }
-  global.ws.send(JSON.stringify(message))
+  if (1 === global.ws.readyState) {
+    global.ws.send(JSON.stringify(message))
+  }
   if (message.command) {
     if (message.command.path === '/API/ngrok/start') {
       await gateways.updateOne({ gatewayId: message.gwid }, { $set: { ngrok: message.response.url } })

@@ -16,7 +16,7 @@ module.exports = async function(service, db) {
     }
     if (mqtt.clientid !== '') {
       mqttConf.clientId = mqttSettings.clientid
-      mqttConf.clean = false
+      mqttConf.clean = true
     }
     global.mqttClient = mqtt.connect(mqttSettings.mqtturl, mqttConf)
     global.mqttClient.on('error', async () => {
