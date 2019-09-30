@@ -10,7 +10,10 @@ module.exports = (service, db) => {
   service.put('/settings/:section', async (req, res) => {
     require('./mqtt')(service, db)
     res.send(
-      await settings.updateOne({ section: req.params.section }, { $set: { ...req.body, section: req.params.section } })
+      await settings.updateOne(
+        { section: req.params.section },
+        { $set: { ...req.body, section: req.params.section } }
+      )
     )
   })
 }

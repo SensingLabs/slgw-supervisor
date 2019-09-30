@@ -11,6 +11,7 @@
     "bootstrap-vue": "^2.0.0-rc.21",
     "core-js": "^2.6.5",
     "cors": "^2.8.5",
+    "moment": "^2.24.0",
     "express-ws": "^4.0.0",
     "mongodb": "^3.2.6",
     "mqtt": "^3.0.0",
