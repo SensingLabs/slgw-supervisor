@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const query = require('qs-middleware')
 const MongoClient = require('mongodb')
 const cors = require('cors')
+require('express-ws')(service)
 
 let port = 9999
 
@@ -19,6 +20,11 @@ MongoClient.MongoClient.connect('mongodb://localhost/supervisor', {
   require('./settings')(service, db)
   require('./mqtt')(service, db)
   require('./basics')(service, db)
+
+  service.ws('/', function(ws, req) {
+    global.ws = ws
+  })
+
   await service.listen(port)
   console.log(`Restana server started on port ${port}`)
 }, console.error)

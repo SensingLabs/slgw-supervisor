@@ -1,11 +1,15 @@
 module.exports = async function(service, db) {
   let gateways = db.collection('gateways')
   let devices = db.collection('devices')
-  let mqttSettings = await db.collection('settings').findOne({ section: 'mqtt' })
+  let mqttSettings = await db
+    .collection('settings')
+    .findOne({ section: 'mqtt' })
   service.get('/data/gateways', async (req, res) => {
     let gws = await gateways.find().toArray()
     for (let gw in gws) {
-      gws[gw].devices = await devices.find({ gatewayId: gws[gw].gatewayId }).toArray()
+      gws[gw].devices = await devices
+        .find({ gatewayId: gws[gw].gatewayId })
+        .toArray()
     }
     res.send(gws)
   })
@@ -25,6 +29,24 @@ module.exports = async function(service, db) {
       JSON.stringify({
         gwid: req.params.gwid,
         commands: [{ method: 'POST', path: '/API/ngrok/stop' }]
+      })
+    )
+    res.end()
+  })
+  service.put('/save/ngrok/:gwid', (req, res) => {
+    global.mqttClient.publish(
+      mqttSettings.ctopic,
+      JSON.stringify({
+        gwid: req.params.gwid,
+        commands: [
+          {
+            method: 'POST',
+            path: '/API/ngrok/save',
+            body: {
+              ngroktoken: req.query.ngroktoken
+            }
+          }
+        ]
       })
     )
     res.end()

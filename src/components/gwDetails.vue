@@ -20,7 +20,9 @@
         slot="lastFrameDate"
         slot-scope="item"
       >
-        <span :class="classLF(item.item.lastFrameDate)">{{ agoLF(item.item.lastFrameDate) }} ago</span>
+        <span :class="classLF(item.item.lastFrameDate)">
+          {{ agoLF(item.item.lastFrameDate) }}
+        </span>
       </template>
       <template
         slot="frameCountUp"
@@ -48,11 +50,6 @@
     <h4>
       Details
     </h4>
-    <p>
-      Last received status : {{ agoLF(item.timestamp) }} ago <sub>{{ item.timestamp }}</sub>
-    </p>
-
-    <br>
     <b-row>
       <b-col lg="6">
         <h5>
@@ -65,18 +62,31 @@
         />
       </b-col>
       <b-col>
-        <h5>
-          Storage
-        </h5>
-        <p>
-          Free {{ Math.floor(item.rootfs.free / 1048576) }} / Total {{ Math.floor(item.rootfs.total / 1048576) }} MB
-        </p>
-      </b-col>
-      <b-col>
-        <h5>
-          Memory
-        </h5>
-        <p>Free {{ Math.floor(item.freemem / 1048576) }} / Total {{ Math.floor(item.totalmem / 1048576) }} MB</p>
+        <b-row>
+          <b-col>
+            <h5>
+              Storage
+            </h5>
+            <p>
+              Free {{ Math.floor(item.rootfs.free / 1048576) }} / Total {{ Math.floor(item.rootfs.total / 1048576) }} MB
+            </p>
+          </b-col>
+          <b-col>
+            <h5>
+              Memory
+            </h5>
+            <p>Free {{ Math.floor(item.freemem / 1048576) }} / Total {{ Math.floor(item.totalmem / 1048576) }} MB</p>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <h5>
+              CPU Load
+            </h5>
+            {{ Math.floor(item.loadavg[0] * 100) / 100 }}<sub> 1 min</sub> {{ Math.floor(item.loadavg[1] * 100) / 100
+            }}<sub> 5 min</sub> {{ Math.floor(item.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
+          </b-col>
+        </b-row>
       </b-col>
     </b-row>
     <h4>
@@ -127,7 +137,7 @@
           <b-button
             variant="success"
             size="sm"
-            @click="remoteService('start/ngrok')"
+            @click="$store.dispatch('startNgrok', { gwid: item.gatewayId })"
           >
             Start
           </b-button>
@@ -135,17 +145,23 @@
           <b-button
             variant="danger"
             size="sm"
-            @click="remoteService('stop/ngrok')"
+            @click="$store.dispatch('stopNgrok', { gwid: item.gatewayId })"
           >
             Stop
           </b-button>
         </p>
-        <p><b-form-input size="sm" /></p>
+        <p>
+          <b-form-input
+            v-model="ngrokToken"
+            size="sm"
+          />
+        </p>
 
         <p>
           <b-button
             variant="info"
             size="sm"
+            @click="$store.dispatch('sendNgrok', { gwid: item.gatewayId, ngroktoken: ngrokToken })"
           >
             Send NGROK token
           </b-button>
@@ -166,6 +182,7 @@
 </template>
 <script>
 import moment from 'moment'
+import VueMomentsAgo from 'vue-moments-ago'
 export default {
   name: 'GwDetails',
   props: ['item'],
@@ -190,7 +207,8 @@ export default {
       frameCountUp: { label: 'FCnt / Missed' },
       devEUI: { label: 'Device ID' }
     },
-    interfaces: []
+    interfaces: [],
+    ngrokToken: ''
   }),
   created() {
     this.update()
@@ -209,15 +227,15 @@ export default {
       let quality = Math.floor((10 * composite + 1300) / 11)
       return quality
     },
-    agoLF(val) {
-      let lf = moment.duration(moment().diff(moment(val)))
-      return lf.humanize()
-    },
     classLF(val) {
       let lf = moment.duration(moment().diff(moment(val)))
       if (moment.duration(1, 'weeks') < lf) return 'text-danger'
       if (moment.duration(1, 'days') < lf) return 'text-warning'
       return 'text-success'
+    },
+    agoLF(val) {
+      let lf = moment.duration(moment().diff(moment(val)))
+      return lf.humanize()
     },
     update() {
       this.interfaces = []
