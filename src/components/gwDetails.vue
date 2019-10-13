@@ -71,8 +71,8 @@
               Storage
             </h5>
             <p>
-              Free {{ Math.floor(item.rootfs.free / 1048576) }} / Total
-              {{ Math.floor(item.rootfs.total / 1048576) }} MB
+              Free {{ Math.floor(gwitem.rootfs.free / 1048576) }} / Total
+              {{ Math.floor(gwitem.rootfs.total / 1048576) }} MB
             </p>
           </b-col>
           <b-col>
@@ -80,8 +80,8 @@
               Memory
             </h5>
             <p>
-              Free {{ Math.floor(item.freemem / 1048576) }} / Total
-              {{ Math.floor(item.totalmem / 1048576) }} MB
+              Free {{ Math.floor(gwitem.freemem / 1048576) }} / Total
+              {{ Math.floor(gwitem.totalmem / 1048576) }} MB
             </p>
           </b-col>
         </b-row>
@@ -90,9 +90,9 @@
             <h5>
               CPU Load
             </h5>
-            {{ Math.floor(item.loadavg[0] * 100) / 100 }}<sub> 1 min</sub>
-            {{ Math.floor(item.loadavg[1] * 100) / 100 }}<sub> 5 min</sub>
-            {{ Math.floor(item.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
+            {{ Math.floor(gwitem.loadavg[0] * 100) / 100 }}<sub> 1 min</sub>
+            {{ Math.floor(gwitem.loadavg[1] * 100) / 100 }}<sub> 5 min</sub>
+            {{ Math.floor(gwitem.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
           </b-col>
         </b-row>
       </b-col>
@@ -101,6 +101,20 @@
       Actions
     </h4>
     <b-row>
+      <b-col lg="2">
+        <h5>local infos</h5>
+        <p>
+          <b-button
+            variant="warning"
+            size="sm"
+            @click="
+              $store.dispatch('refreshDevices', { gwid: gwitem.gatewayId })
+            "
+          >
+            Refresh devices list
+          </b-button>
+        </p>
+      </b-col>
       <b-col lg="2">
         <h5>Custom VPN</h5>
         <p>
@@ -145,7 +159,7 @@
           <b-button
             variant="success"
             size="sm"
-            @click="$store.dispatch('startNgrok', { gwid: item.gatewayId })"
+            @click="$store.dispatch('startNgrok', { gwid: gwitem.gatewayId })"
           >
             Start
           </b-button>
@@ -153,7 +167,7 @@
           <b-button
             variant="danger"
             size="sm"
-            @click="$store.dispatch('stopNgrok', { gwid: item.gatewayId })"
+            @click="$store.dispatch('stopNgrok', { gwid: gwitem.gatewayId })"
           >
             Stop
           </b-button>
@@ -171,7 +185,7 @@
             size="sm"
             @click="
               $store.dispatch('sendNgrok', {
-                gwid: item.gatewayId,
+                gwid: gwitem.gatewayId,
                 ngroktoken: ngrokToken
               })
             "
@@ -182,11 +196,11 @@
         </p>
         <p>
           <b-link
-            v-if="item.ngrok !== ''"
-            :href="item.ngrok"
+            v-if="gwitem.ngrok !== ''"
+            :href="gwitem.ngrok"
             target="_blank"
           >
-            <u> {{ item.ngrok }}</u>
+            <u> {{ gwitem.ngrok }}</u>
           </b-link>
         </p>
       </b-col>

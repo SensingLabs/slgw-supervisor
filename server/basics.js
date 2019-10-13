@@ -16,6 +16,18 @@ module.exports = async function(service, db) {
     res.send(gws)
   })
 
+  service.put('/triggerNetstatus/:gwid', async (req, res) => {
+    await devices.deleteMany({ gatewayId: req.params.gwid })
+    global.mqttClient.publish(
+      mqttSettings.ctopic,
+      JSON.stringify({
+        gwid: req.params.gwid,
+        commands: [{ method: 'GET', path: '/API/mqttstatus' }]
+      })
+    )
+    res.end()
+  })
+
   service.put('/start/ngrok/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,

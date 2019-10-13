@@ -84,14 +84,23 @@
         &nbsp;<span class="text-info">{{ message }}</span>
       </b-col>
       <b-col>
-        <b-button
-          variant="info"
-          class="float-right"
-          size="sm"
-          @click="save"
-        >
-          Save
-        </b-button>
+        <span class="float-right">
+          <b-button
+            variant="info"
+            size="sm"
+            @click="$parent.$parent.mqttcheck = true"
+          >
+            Back
+          </b-button>
+          &nbsp;
+          <b-button
+            variant="warning"
+            size="sm"
+            @click="save"
+          >
+            Save
+          </b-button>
+        </span>
       </b-col>
     </b-row>
   </div>
@@ -115,7 +124,7 @@ export default {
   },
 
   async mounted() {
-    let _response = await fetch('http://localhost:9999/settings/mqtt', {
+    let _response = await fetch(this.$store.state.apiroot + '/settings/mqtt', {
       method: 'GET',
       mode: 'cors'
     })
@@ -128,7 +137,7 @@ export default {
   },
   methods: {
     async purgeDB() {
-      await fetch('http://localhost:9999/data', {
+      await fetch(this.$store.state.apiroot + '/data', {
         method: 'DELETE',
         mode: 'cors'
       })
@@ -138,7 +147,7 @@ export default {
       }, 5000)
     },
     async save() {
-      await fetch('http://localhost:9999/settings/mqtt', {
+      await fetch(this.$store.state.apiroot + '/settings/mqtt', {
         method: 'PUT',
         mode: 'cors',
         headers: {
@@ -154,10 +163,13 @@ export default {
     },
     pollData() {
       this.checkpolling = setInterval(async () => {
-        let _response = await fetch('http://localhost:9999/settings/mqtt', {
-          method: 'GET',
-          mode: 'cors'
-        })
+        let _response = await fetch(
+          this.$store.state.apiroot + '/settings/mqtt',
+          {
+            method: 'GET',
+            mode: 'cors'
+          }
+        )
         let data = await _response.json()
         this.$parent.$parent.mqttcheck = data.check
       }, 5000)

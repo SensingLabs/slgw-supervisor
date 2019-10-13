@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    apiroot,
     socket: {
       isConnected: false,
       message: '',
@@ -17,6 +18,10 @@ export default new Vuex.Store({
   mutations: {
     setGateways(state, payload) {
       state.gateways = payload
+    },
+    purgeDevices(state, gwid) {
+      let gwIdx = state.gateways.find(gw => gw.gatewayId === gwid)
+      gwIdx.devices = []
     },
     SOCKET_ONOPEN(state, event) {
       Vue.prototype.$socket = event.currentTarget
@@ -33,7 +38,9 @@ export default new Vuex.Store({
       state.socket.message = _message
       let message = JSON.parse(_message.data)
       if (null != message.gatewayId) {
-        let index = state.gateways.findIndex(elt => elt.gatewayId === message.gatewayId)
+        let index = state.gateways.findIndex(
+          elt => elt.gatewayId === message.gatewayId
+        )
         if (-1 < index) {
           Vue.set(state.gateways, index, message)
         } else {
@@ -42,13 +49,17 @@ export default new Vuex.Store({
       }
       if (null != message.command) {
         if (message.command.path === '/API/ngrok/start') {
-          let index = state.gateways.findIndex(elt => elt.gatewayId === message.gwid)
+          let index = state.gateways.findIndex(
+            elt => elt.gatewayId === message.gwid
+          )
           if (-1 < index) {
             state.gateways[index].ngrok = message.response.url
           }
         }
         if (message.command.path === '/API/ngrok/stop') {
-          let index = state.gateways.findIndex(elt => elt.gatewayId === message.gwid)
+          let index = state.gateways.findIndex(
+            elt => elt.gatewayId === message.gwid
+          )
           if (-1 < index) {
             state.gateways[index].ngrok = ''
           }
@@ -64,6 +75,13 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    async refreshDevices(context, { gwid }) {
+      context.commit('purgeDevices', gwid)
+      await fetch(apiroot + '/triggerNetstatus/' + gwid, {
+        method: 'PUT',
+        mode: 'cors'
+      })
+    },
     async gatewaysFetch(context) {
       let _response = await fetch(apiroot + '/data/gateways', {
         method: 'GET',
@@ -85,10 +103,13 @@ export default new Vuex.Store({
       })
     },
     async sendNgrok(context, { gwid, ngroktoken }) {
-      await fetch(apiroot + '/save/ngrok/' + gwid + '/?ngroktoken=' + ngroktoken, {
-        method: 'PUT',
-        mode: 'cors'
-      })
+      await fetch(
+        apiroot + '/save/ngrok/' + gwid + '/?ngroktoken=' + ngroktoken,
+        {
+          method: 'PUT',
+          mode: 'cors'
+        }
+      )
     }
   }
 })
