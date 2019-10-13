@@ -4,7 +4,7 @@
       Devices
     </h4>
     <b-table
-      :items="item.devices"
+      :items="gwitem.devices"
       :fields="devfields"
     >
       <template
@@ -41,7 +41,10 @@
       >
         <b-progress variant="info">
           <b-progress-bar :value="signalLevel(item.item)">
-            <span class="text-white small">{{ item.item.lastFrameRSSI }} / {{ item.item.lastFrameLSNR }}</span>
+            <span
+              class="text-white small"
+            >{{ item.item.lastFrameRSSI }} /
+              {{ item.item.lastFrameLSNR }}</span>
           </b-progress-bar>
         </b-progress>
       </template>
@@ -68,14 +71,18 @@
               Storage
             </h5>
             <p>
-              Free {{ Math.floor(item.rootfs.free / 1048576) }} / Total {{ Math.floor(item.rootfs.total / 1048576) }} MB
+              Free {{ Math.floor(item.rootfs.free / 1048576) }} / Total
+              {{ Math.floor(item.rootfs.total / 1048576) }} MB
             </p>
           </b-col>
           <b-col>
             <h5>
               Memory
             </h5>
-            <p>Free {{ Math.floor(item.freemem / 1048576) }} / Total {{ Math.floor(item.totalmem / 1048576) }} MB</p>
+            <p>
+              Free {{ Math.floor(item.freemem / 1048576) }} / Total
+              {{ Math.floor(item.totalmem / 1048576) }} MB
+            </p>
           </b-col>
         </b-row>
         <b-row>
@@ -83,8 +90,9 @@
             <h5>
               CPU Load
             </h5>
-            {{ Math.floor(item.loadavg[0] * 100) / 100 }}<sub> 1 min</sub> {{ Math.floor(item.loadavg[1] * 100) / 100
-            }}<sub> 5 min</sub> {{ Math.floor(item.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
+            {{ Math.floor(item.loadavg[0] * 100) / 100 }}<sub> 1 min</sub>
+            {{ Math.floor(item.loadavg[1] * 100) / 100 }}<sub> 5 min</sub>
+            {{ Math.floor(item.loadavg[2] * 100) / 100 }}<sub> 15 min</sub>
           </b-col>
         </b-row>
       </b-col>
@@ -161,7 +169,12 @@
           <b-button
             variant="info"
             size="sm"
-            @click="$store.dispatch('sendNgrok', { gwid: item.gatewayId, ngroktoken: ngrokToken })"
+            @click="
+              $store.dispatch('sendNgrok', {
+                gwid: item.gatewayId,
+                ngroktoken: ngrokToken
+              })
+            "
           >
             Send NGROK token
           </b-button>
@@ -182,10 +195,9 @@
 </template>
 <script>
 import moment from 'moment'
-import VueMomentsAgo from 'vue-moments-ago'
 export default {
   name: 'GwDetails',
-  props: ['item'],
+  props: { gwitem: { default: () => ({}), type: Object } },
   data: () => ({
     iffields: {
       name: {
@@ -215,7 +227,7 @@ export default {
   },
   methods: {
     async remoteService(action) {
-      await fetch('/' + action + '/' + this.item.gatewayId, {
+      await fetch('/' + action + '/' + this.gwitem.gatewayId, {
         method: 'PUT',
         mode: 'cors'
       })
@@ -234,24 +246,24 @@ export default {
       return 'text-success'
     },
     agoLF(val) {
-      let lf = moment.duration(moment(this.item.timestamp).diff(moment(val)))
+      let lf = moment.duration(moment(this.gwitem.timestamp).diff(moment(val)))
       return lf.humanize()
     },
     update() {
       this.interfaces = []
-      for (let _i in this.item.interfaces) {
-        for (let _a in this.item.interfaces[_i]) {
-          if ('lo' !== _i && this.item.interfaces[_i][_a].family !== 'IPv6') {
+      for (let _i in this.gwitem.interfaces) {
+        for (let _a in this.gwitem.interfaces[_i]) {
+          if ('lo' !== _i && this.gwitem.interfaces[_i][_a].family !== 'IPv6') {
             this.interfaces.push({
               name: _i,
-              ip: this.item.interfaces[_i][_a].address,
-              mac: this.item.interfaces[_i][_a].mac
+              ip: this.gwitem.interfaces[_i][_a].address,
+              mac: this.gwitem.interfaces[_i][_a].mac
             })
           }
         }
       }
-      for (let _d in this.item.devices) {
-        delete this.item.devices[_d]._id
+      for (let _d in this.gwitem.devices) {
+        delete this.gwitem.devices[_d]._id
       }
     }
   }

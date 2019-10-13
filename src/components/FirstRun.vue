@@ -1,7 +1,8 @@
 <template>
   <b-container id="first-run">
+    <br>
     <b-card
-      header="First Run"
+      header="MQTT Configuration"
       bg-variant="dark"
       text-variant="white"
     >

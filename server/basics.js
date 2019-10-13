@@ -1,9 +1,11 @@
 module.exports = async function(service, db) {
   let gateways = db.collection('gateways')
   let devices = db.collection('devices')
+
   let mqttSettings = await db
     .collection('settings')
     .findOne({ section: 'mqtt' })
+
   service.get('/data/gateways', async (req, res) => {
     let gws = await gateways.find().toArray()
     for (let gw in gws) {
@@ -13,6 +15,7 @@ module.exports = async function(service, db) {
     }
     res.send(gws)
   })
+
   service.put('/start/ngrok/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -23,6 +26,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/stop/ngrok/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -33,6 +37,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/save/ngrok/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -51,6 +56,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/start/vpn/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -61,6 +67,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/stop/vpn/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -71,6 +78,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/start/custom/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,
@@ -81,6 +89,7 @@ module.exports = async function(service, db) {
     )
     res.end()
   })
+
   service.put('/stop/custom/:gwid', (req, res) => {
     global.mqttClient.publish(
       mqttSettings.ctopic,

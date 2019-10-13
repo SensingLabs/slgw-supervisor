@@ -74,7 +74,14 @@
 
     <b-row class="justify-content-center">
       <b-col lg="10">
-        &nbsp;
+        <b-button
+          variant="danger"
+          size="sm"
+          @click="purgeDB"
+        >
+          Purge Database
+        </b-button>
+        &nbsp;<span class="text-info">{{ message }}</span>
       </b-col>
       <b-col>
         <b-button
@@ -99,8 +106,14 @@ export default {
     ctopic: '',
     cert: '',
     key: '',
-    ca: ''
+    ca: '',
+    message: '',
+    checkpolling: null
   }),
+  beforeDestroy() {
+    clearInterval(this.checkpolling)
+  },
+
   async mounted() {
     let _response = await fetch('http://localhost:9999/settings/mqtt', {
       method: 'GET',
@@ -114,8 +127,18 @@ export default {
     }
   },
   methods: {
+    async purgeDB() {
+      await fetch('http://localhost:9999/data', {
+        method: 'DELETE',
+        mode: 'cors'
+      })
+      this.message = 'Database purged'
+      setTimeout(() => {
+        this.message = ''
+      }, 5000)
+    },
     async save() {
-      await fetch('/settings/mqtt', {
+      await fetch('http://localhost:9999/settings/mqtt', {
         method: 'PUT',
         mode: 'cors',
         headers: {
@@ -123,13 +146,21 @@ export default {
         },
         body: JSON.stringify(this._data)
       })
-      let _response = await fetch('http://localhost:9999/settings/mqtt', {
-        method: 'GET',
-        mode: 'cors'
-      })
-      let data = await _response.json()
-      console.log(data)
-      this.$parent.$parent.mqttcheck = data.check
+      this.pollData()
+      this.message = 'Setting saved. Waiting for connection...'
+      setTimeout(() => {
+        this.message = 'Connection not established, please check your settings.'
+      }, 30000)
+    },
+    pollData() {
+      this.checkpolling = setInterval(async () => {
+        let _response = await fetch('http://localhost:9999/settings/mqtt', {
+          method: 'GET',
+          mode: 'cors'
+        })
+        let data = await _response.json()
+        this.$parent.$parent.mqttcheck = data.check
+      }, 5000)
     }
   }
 }

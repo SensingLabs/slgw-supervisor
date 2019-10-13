@@ -110,7 +110,7 @@
         slot="row-details"
         slot-scope="row"
       >
-        <gw-details :item="row.item" />
+        <gw-details :gwitem="row.item" />
       </template>
     </b-table>
     <br>
@@ -122,6 +122,21 @@
       <b-row>
         <b-col>
           <small>Gateways count : <b>{{ gateways ? gateways.length : 0 }}</b></small>
+        </b-col>
+        <b-col
+          v-if="gateways.length < 1"
+          class="text-center text-info"
+          style="margin-top:3px"
+        >
+          Waiting for statuses...
+        </b-col>
+        <b-col>
+          <font-awesome-icon
+            class="float-right"
+            icon="cog"
+            style="margin-top:2px"
+            @click="$parent.mqttcheck = false"
+          />
         </b-col>
       </b-row>
     </b-container>
@@ -137,7 +152,6 @@ export default {
   name: 'Gateways',
   components: { gwDetails, VueMomentsAgo },
   data: () => ({
-    polling: null,
     gwfields: {
       show_details: { label: '' },
       gatewayId: { label: 'HWID' },
@@ -150,10 +164,10 @@ export default {
       timestamp: { label: 'Status' }
     }
   }),
+  computed: mapState(['gateways']),
   async mounted() {
     this.$store.dispatch('gatewaysFetch')
   },
-  computed: mapState(['gateways']),
   beforeDestroy() {
     clearInterval(this.polling)
   },
@@ -165,7 +179,12 @@ export default {
       let c = 0
       for (let dev of devs) {
         let lf = moment.duration(moment().diff(moment(dev.lastFrameDate)))
-        if (moment.duration(1, 'days') < lf && moment.duration(1, 'weeks') > lf) c++
+        if (
+          moment.duration(1, 'days') < lf &&
+          moment.duration(1, 'weeks') > lf
+        ) {
+          c++
+        }
       }
       return c
     },
