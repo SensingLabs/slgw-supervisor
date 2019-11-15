@@ -1,29 +1,18 @@
 # slgw-supervisor
 
+## Requirement
+
+* node stable 
+* a local mongodb server
+
 ## Project setup
 ```
-yarn install
+$ yarn install
 ```
 
-### Compiles and hot-reloads for development
+## Project Run
+Launch a local server 
 ```
-yarn run serve
+$ node server
 ```
-
-### Compiles and minifies for production
-```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+open in browser : [http://localhost:9999](http://localhost:9999)
