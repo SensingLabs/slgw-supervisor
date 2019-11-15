@@ -3,7 +3,7 @@
 ## Requirement
 
 * [node](https://nodejs.org/) stable use [nvm](https://github.com/nvm-sh/nvm) for better version management
-* a local [mongodb](https://www.mongodb.com/download-center/community) server
+* a local [mongodb](https://www.mongodb.com/download-center/community) server (default configuration is ok)
 
 ## Project setup
 ```
