@@ -11,6 +11,8 @@ $ yarn install
 $ yarn build
 ```
 
+Adjust your mongo access in file server/index.js
+
 ## Project Run
 Launch a local server 
 ```
