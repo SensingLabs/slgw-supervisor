@@ -15,7 +15,7 @@
     "core-js": "^2.6.5",
     "cors": "^2.8.5",
     "express-ws": "^4.0.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mongodb": "^3.2.6",
     "mqtt": "^3.0.0",
     "qs-middleware": "^1.0.3",
